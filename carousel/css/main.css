@@ -5,11 +5,10 @@ body, html {
     overflow-x: hidden;
 }
 
-
 body {
     font-family: sans-serif;
     padding: 50px;
-    background: linear-gradient(45deg, #099112, #00d4ff) center center no-repeat;
+    background: linear-gradient(45deg, #f37646, #f3e946) center center no-repeat;
     line-height: 1.4;
 }
 
@@ -20,7 +19,6 @@ body {
     margin-bottom: 25px;
 }
 
-
 .item {
     margin: 40px 10px;
     background-color: #fff;
@@ -28,8 +26,6 @@ body {
     transition: transform 0.3s;
     transform: translate3d(0, -1px, 0);
 }
-
-
 
 .item:hover {
     transform: translate3d(0, -10px, 0);
@@ -45,14 +41,12 @@ body {
     padding: 25px;
 }
 
-
 .item-title {
     font-size: 24px;
     margin-bottom: 5px;
     font-weight: bold;
     color: #232323;
 }
-
 
 .item-description {
     color: #585858;
