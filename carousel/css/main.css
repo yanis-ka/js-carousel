@@ -8,9 +8,9 @@ body, html {
 body {
     font-family: sans-serif;
     padding: 50px;
-    background: linear-gradient(45deg, #f37646, #f3e946) center center no-repeat;
-    line-height: 1.4;
-}
+    background: linear-gradient(45deg, rgba(194,138,52,1) 3%, rgba(81,140,84,1) 47%, rgba(81,140,84,1) 77%, rgba(164,115,18,1) 95%, rgba(87,131,105,1) 100%);}
+
+/* background: linear-gradient(45deg, #ddbc28, #78c51f) */
 
 .title{
     font-size: 25px;
@@ -54,5 +54,54 @@ body {
 
 .item {
     position: relative;
+}
+
+
+/**
+CAROUSEL
+*/
+
+.carousel {
+    position: relative;
+}
+
+.carousel-container {
+    transition: transform 0.3s;
+    transform: translate3d(0, 0, 0);
+}
+
+.carousel-container::after {
+    content: '';
+    clear: both;
+    display: table;
+}
+
+.carousel-item {
+    float: left;
+}
+
+.carousel-next, .carousel-prev {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #fff url(https://grafikart.fr/demo/JS/Carousel/4beb4317ebb605abb3096d9a1b5dbde4.svg) center center no-repeat;
+    background-size: 20px 20px;
+    border-radius: 50%;
+    top: 50%;
+    margin-top: -20px;
+    right: -20px;
+    box-shadow: 0 15px 35px #3232321a, 0 5px 15px #0000001a;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.carousel-next:hover, .carousel-prev:hover {
+    transform: scale(1.2);
+}
+
+.carousel-prev {
+    right: auto;
+    left: -20px;
+    background-image: url(https://grafikart.fr/demo/JS/Carousel/34e24e9b7204d9bc7367d0d520ca4157.svg);
 }
 
