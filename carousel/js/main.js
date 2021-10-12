@@ -4,9 +4,9 @@ class Carousel {
      * 
      * @param {HTMLElement} element 
      * @param {Object} options 
-     * @param {Object} options.slideToScroll Nombre d'élément à faire défiler
-     * @param {Object} options.slidesVisible Nombre d'éléments visibles dans un slide
-     * 
+     * @param {Object} [options.slideToScroll=1] Nombre d'élément à faire défiler
+     * @param {Object} [options.slidesVisible=1] Nombre d'éléments visibles dans un slide
+     * @param {Boolean} [options.loop=false] Doit-on boucler en fin de slides
      */ 
     
 
@@ -14,15 +14,17 @@ class Carousel {
         this.element = element
         this.options = Object.assign({}, {
             slideToScroll: 1,
-            slidesVisible: 1
+            slidesVisible: 1,
+            loop: false
         }, options)
         let children = [].slice.call(element.children)
+        this.isMobile = false
         this.currentItem = 0
         this.root = this.createDivWithClass('carousel')
         this.container = this.createDivWithClass('carousel-container')
         this.root.appendChild(this.container)
         this.element.appendChild(this.root)
-
+        this.moveCallbacks = []
         this.items = children.map((child) => {
             let item = this.createDivWithClass('carousel-item')
             item.appendChild(child)
@@ -31,16 +33,19 @@ class Carousel {
         })
         this.setStyle()
         this.createNavigation()
+        this.moveCallbacks.forEach(cb => cb(0))
+        this.onResize()
+        window.addEventListener('resize', this.onResize.bind(this))
     }
 
     /**
      * Applique mes bonnes dimensions aux éléments du carousel
      */
     setStyle() {
-        let ratio = this.items.length / this.options.slidesVisible
+        let ratio = this.items.length / this.slidesVisible
         this.container.style.width = (ratio * 100) +'%'
         this.items.forEach(item => {
-            item.style.width = (100 / this.options.slidesVisible) / ratio + '%'
+            item.style.width = (100 / this.slidesVisible) / ratio + '%'
         })
     }
 
@@ -52,14 +57,30 @@ class Carousel {
         this.root.appendChild(prevButton)
         nextButton.addEventListener('click', this.next.bind(this))
         prevButton.addEventListener('click', this.prev.bind(this))
+        if (this.options.loop === true) {
+            return
+        }
+        this.onMove(index => {
+            if (index === 0) {
+                prevButton.classList.add('carousel-prev-hidden')
+            } else {
+                prevButton.classList.remove('carousel-prev-hidden')
+            }
+            if (this.items[this.currentItem + this.slidesVisible] === undefined) {
+                nextButton.classList.add('carousel-next-hidden')
+                
+            } else {
+                nextButton.classList.remove('carousel-next-hidden')            
+            }
+        })
     }
 
     next() {
-        this.goToItem(this.currentItem + this.options.slideToScroll)
+        this.goToItem(this.currentItem + this.slideToScroll)
     }
 
     prev() {
-        this.goToItem(this.currentItem - this.options.slideToScroll)
+        this.goToItem(this.currentItem - this.slideToScroll)
     }
 
     /**
@@ -67,9 +88,43 @@ class Carousel {
      * @param {number} index 
      */
     goToItem(index) {
+        if (index < 0) {
+            index = this.items.length - this.options.slidesVisible
+        } else if (index >= this.items.length || (this.items[this.currentItem + this.options.slidesVisible] === undefined) && index > this.currentItem) {
+            // + this.options.slideToScroll - this.options.slidesVisible
+            index = 0
+        }
         let translateX = (index * (-100)) / this.items.length
         this.container.style.transform = 'translate3d(' + translateX + '%, 0, 0)'
         this.currentItem = index
+        this.moveCallbacks.forEach(cb => cb(index))
+    }
+
+    onMove(cb) {
+        this.moveCallbacks.push(cb)
+    }
+
+    onResize () {
+        let mobile = window.innerWidth < 800
+        if (mobile !== this.isMobile) {
+            this.isMobile = mobile
+            this.setStyle()
+            this.moveCallbacks.forEach(cb => cb(this.currentItem))
+        }
+    }
+
+    /**
+     * @returns {Number}
+     */
+    get slideToScroll () {
+        return this.isMobile ? 1 : this.options.slideToScroll
+    }
+    
+    /**
+     * @returns {Number}
+     */
+    get slidesVisible() {
+        return this.isMobile ? 1 : this.options.slidesVisible
     }
 
     /**
@@ -87,7 +142,14 @@ class Carousel {
 
 document.addEventListener('DOMContentLoaded', function() {
     new Carousel(document.querySelector('#carousel1'), {
-        slidesVisible:3
+        slidesVisible: 3,
+        slideToScroll: 2,
+        loop: true
+    })
+    new Carousel(document.querySelector('#carousel2'), {
+        slideToScroll: 2,
+        slidesVisible: 2
     })
 
+    new Carousel(document.querySelector('#carousel3'))
 })
