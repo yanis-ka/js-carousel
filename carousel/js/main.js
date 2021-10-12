@@ -20,11 +20,14 @@ class Carousel {
         let children = [].slice.call(element.children)
         this.isMobile = false
         this.currentItem = 0
+        this.moveCallbacks = []
+
+        //Modif du DOM
         this.root = this.createDivWithClass('carousel')
         this.container = this.createDivWithClass('carousel-container')
+        this.root.setAttribute('tabindex', '0')
         this.root.appendChild(this.container)
         this.element.appendChild(this.root)
-        this.moveCallbacks = []
         this.items = children.map((child) => {
             let item = this.createDivWithClass('carousel-item')
             item.appendChild(child)
@@ -35,6 +38,15 @@ class Carousel {
         this.createNavigation()
         this.moveCallbacks.forEach(cb => cb(0))
         this.onResize()
+
+        //Evenements
+        this.root.addEventListener('keyup', e => {
+            if (e.key === 'ArrowRight' || e.key === 'Right') {
+                this.next()
+            } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+                this.prev()
+            }
+        })
         window.addEventListener('resize', this.onResize.bind(this))
     }
 
@@ -89,10 +101,18 @@ class Carousel {
      */
     goToItem(index) {
         if (index < 0) {
-            index = this.items.length - this.options.slidesVisible
-        } else if (index >= this.items.length || (this.items[this.currentItem + this.options.slidesVisible] === undefined) && index > this.currentItem) {
+            if (this.options.loop) {
+                index = this.items.length - this.slidesVisible
+            } else {
+                return
+            }
+        } else if (index >= this.items.length || (this.items[this.currentItem + this.slidesVisible] === undefined) && index > this.currentItem) {
             // + this.options.slideToScroll - this.options.slidesVisible
-            index = 0
+            if (this.options.loop) {
+                index = 0
+            } else {
+                return
+            }
         }
         let translateX = (index * (-100)) / this.items.length
         this.container.style.transform = 'translate3d(' + translateX + '%, 0, 0)'
